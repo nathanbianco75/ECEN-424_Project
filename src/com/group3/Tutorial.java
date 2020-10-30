@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -14,6 +15,13 @@ public class Tutorial extends JFrame {
     }
 
     private void initializeGUI(JButton tutorial) {
+        JLabel text = new JLabel(
+        "<html><body>" +
+                "Welcome to our game!" + "<br><br>" +
+                "TODO" +
+            "</body></html>"
+        );
+
         JButton close = new JButton("Close");
         close.addActionListener(new ActionListener() {
             @Override
@@ -24,6 +32,7 @@ public class Tutorial extends JFrame {
         });
 
         JPanel content = new JPanel();
+        content.add(text);
         content.add(close);
 
         add(BorderLayout.CENTER, content);
