@@ -9,38 +9,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class ClientGame extends JFrame {
+public class ClientGame extends GameFrame {
 
     public ClientGame() {
         initializeGUI();
     }
 
-    private void initializeGUI() {
-        JButton quit = new JButton("Quit");
-        quit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new MainMenu();
-                dispose();
-            }
-        });
-
-        JPanel content = new JPanel();
-        content.add(quit);
-
-        add(BorderLayout.CENTER, content);
-        setSize(1600, 900);
-        setResizable(false);
-        setLocationRelativeTo(null);
+    @Override
+    protected void initializeGUI() {
+        super.initializeGUI();
         setTitle("Client Game");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                new MainMenu();
-            }
-        });
-        setVisible(true);
     }
 }

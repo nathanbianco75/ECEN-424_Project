@@ -36,7 +36,8 @@ public class MainMenu extends JFrame {
         tutorial.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Tutorial();
+                tutorial.setEnabled(false);
+                new Tutorial(tutorial);
             }
         });
 

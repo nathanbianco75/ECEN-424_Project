@@ -9,15 +9,16 @@ import java.awt.event.ActionListener;
 
 public class Tutorial extends JFrame {
 
-    public Tutorial() {
-        initializeGUI();
+    public Tutorial(JButton tutorial) {
+        initializeGUI(tutorial);
     }
 
-    private void initializeGUI() {
+    private void initializeGUI(JButton tutorial) {
         JButton close = new JButton("Close");
         close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                tutorial.setEnabled(true);
                 dispose();
             }
         });
