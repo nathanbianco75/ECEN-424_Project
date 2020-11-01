@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 public class MainMenu extends JFrame {
 
     public MainMenu() {
+        NetworkUtility.disconnect();
         initializeGUI();
     }
 

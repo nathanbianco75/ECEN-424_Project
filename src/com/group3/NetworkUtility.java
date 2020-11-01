@@ -18,11 +18,13 @@ public class NetworkUtility {
 
     //  Open connection and wait for a client to join
     //      Return true if client connected successfully, false if exception occurred
-    public static boolean hostClient() {
+    public static boolean hostServer() {
+        disconnect();
         ServerSocket serverSocket = null;
         try {
             serverSocket = new ServerSocket(PORT);
             clientSocket = serverSocket.accept();
+            System.out.println("hostServer(): Client connected successfully");
             writer = new PrintWriter(clientSocket.getOutputStream());
             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         } catch (IOException e) {
@@ -42,10 +44,12 @@ public class NetworkUtility {
     // Allows client to connect to host
     //      If return is false, there was a fatal error and another IP should be tried
     public static boolean joinHost(String ip) {
+        disconnect();
         if (ip.equals(""))
             ip = "127.0.0.1";
         try {
             clientSocket = new Socket(ip, PORT);
+            System.out.println("joinHost(): Connected to Host successfully");
             reader = new BufferedReader((new InputStreamReader(clientSocket.getInputStream())));
             writer = new PrintWriter(clientSocket.getOutputStream());
             return true;
@@ -64,6 +68,7 @@ public class NetworkUtility {
         String message;
         try {
             message = reader.readLine();
+            System.out.println("readSocket(): message = " + message);
             return message;
         } catch (IOException e) {
             System.out.println("Error reading from clientSocket:");
@@ -90,6 +95,7 @@ public class NetworkUtility {
                 System.out.println("Error closing clientSocket:");
                 e.printStackTrace();
             }
+            clientSocket = null;
         }
     }
 
@@ -109,7 +115,7 @@ public class NetworkUtility {
         } catch (IOException e) {
             System.out.println("Error retrieving external IP:");
             e.printStackTrace();
-            return "Unkown";
+            return "Unknown";
         }
     }
 }

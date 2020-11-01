@@ -1,5 +1,7 @@
 package com.group3;
 
+import com.sun.tools.javac.Main;
+
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,8 +14,11 @@ import java.awt.event.WindowEvent;
 
 public class PreGameLobby extends JFrame {
 
-    private boolean isHost;
-    private String name;
+    protected boolean isHost;
+    protected String name;
+    protected JButton start;
+    protected JLabel opponent_name;
+    protected JLabel status;
 
     public PreGameLobby(boolean isHost, String name) {
         this.isHost = isHost;
@@ -25,35 +30,49 @@ public class PreGameLobby extends JFrame {
         int numPlayers = 2;
         JLabel[] playerNames = new JLabel[numPlayers];
         playerNames[0] = new JLabel(name);
-        // TODO: Get player names through network connections
-        playerNames[1] = new JLabel("Default player name");
+        playerNames[1] = new JLabel("<Empty>");
+        opponent_name = playerNames[1];
 
-        // TODO: make start disabled until client(s) join the lobby
-        JButton start = new JButton("Start");
         if (isHost)
-            start.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (isHost) {
+            status = new JLabel("Waiting on an opponent...");
+        else
+            status = new JLabel("Waiting for you to Ready up...");
+
+        start = new JButton("");
+        if (isHost) {
+            start.setEnabled(false);
+            start.setText("Start");
+        }
+        else
+            start.setText("Ready");
+        start.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isHost) {
+                    dispose();
+                    if (NetworkUtility.writeSocket("start"))
                         new HostGame();
+                    else
+                        new MainMenu();
+                }
+                else {
+                    if (NetworkUtility.writeSocket("ready")) {
+                        start.setEnabled(false);
+                        status.setText("Waiting for the host to start the game...");
                     }
                     else {
-                        new ClientGame();
+                        dispose();
+                        new MainMenu();
                     }
-                    dispose();
                 }
-            });
-        else
-            start.setEnabled(false);
+            }
+        });
 
         JPanel content = new JPanel();
         for (int i = 0; i < numPlayers; i++) {
             content.add(playerNames[i]);
         }
-        if (isHost)
-            content.add(new JLabel("Waiting for you to start the game..."));
-        else
-            content.add(new JLabel("Waiting for host to start the game..."));
+        content.add(status);
         content.add(start);
 
         add(BorderLayout.CENTER, content);
@@ -70,5 +89,54 @@ public class PreGameLobby extends JFrame {
             }
         });
         setVisible(true);
+
+        new Thread(new Listener()).start();
     }
+
+    public class Listener implements Runnable {
+
+        public Listener() { }
+
+        public void run() {
+            if (isHost) {
+                if (NetworkUtility.hostServer())
+                    status.setText("Waiting for your opponent to Ready up...");
+                else {
+                    dispose();
+                    new MainMenu();
+                    return;
+                }
+            }
+
+            NetworkUtility.writeSocket(name);
+            String response = NetworkUtility.readSocket();
+            if (response != null)
+                opponent_name.setText(response);
+            else {
+                dispose();
+                new MainMenu();
+                return;
+            }
+
+            if (isHost) {
+                if (NetworkUtility.readSocket() != null) {
+                    start.setEnabled(true);
+                    status.setText("Waiting for you to start the game...");
+                }
+                else {
+                    dispose();
+                    new MainMenu();
+                }
+            }
+            else {
+                if (NetworkUtility.readSocket() != null)
+                    new ClientGame();
+                else
+                    new MainMenu();
+                dispose();
+            }
+        }
+    }
+
+
 }

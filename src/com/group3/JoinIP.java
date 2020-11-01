@@ -20,19 +20,28 @@ public class JoinIP extends JFrame {
     private void initializeGUI() {
         JTextField ip = new JTextField("127.0.0.1");
 
+        JLabel status = new JLabel("");
+
         JButton connect = new JButton("Connect");
         connect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Perform IP address validation and connect to server through socket before continuing
-                new EnterName(false);
-                dispose();
+                String ip_addr = ip.getText();
+                if (ip_addr.equals(""))
+                    ip_addr = "127.0.0.1";
+                if (NetworkUtility.joinHost(ip_addr)) {
+                    dispose();
+                    new EnterName(false);
+                }
+                else
+                    status.setText("Status: Error: Connection to host at " + ip_addr + " failed.");
             }
         });
 
         JPanel content = new JPanel();
         content.add(new JLabel("IP:"));
         content.add(ip);
+        content.add(status);
         content.add(connect);
 
         add(BorderLayout.CENTER, content);

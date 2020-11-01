@@ -27,8 +27,8 @@ public class EnterName extends JFrame {
         accept.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new PreGameLobby(isHost, name.getText());
                 dispose();
+                new PreGameLobby(isHost, name.getText());
             }
         });
 
@@ -48,6 +48,7 @@ public class EnterName extends JFrame {
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 new MainMenu();
+                NetworkUtility.disconnect();
             }
         });
         setVisible(true);

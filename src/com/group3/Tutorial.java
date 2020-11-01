@@ -26,8 +26,8 @@ public class Tutorial extends JFrame {
         close.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tutorial.setEnabled(true);
                 dispose();
+                tutorial.setEnabled(true);
             }
         });
 
