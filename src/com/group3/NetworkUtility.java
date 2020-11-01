@@ -39,6 +39,23 @@ public class NetworkUtility {
         return true;
     }
 
+    // Allows client to connect to host
+    //      If return is false, there was a fatal error and another IP should be tried
+    public static boolean joinHost(String ip) {
+        if (ip.equals(""))
+            ip = "127.0.0.1";
+        try {
+            clientSocket = new Socket(ip, PORT);
+            reader = new BufferedReader((new InputStreamReader(clientSocket.getInputStream())));
+            writer = new PrintWriter(clientSocket.getOutputStream());
+            return true;
+        } catch (IOException e) {
+            System.out.println("Error connecting to the host:");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Allows host or client to read input from the other
     //      If return is null, there was a fatal error and the connection should be closed.
     public static String readSocket() {
