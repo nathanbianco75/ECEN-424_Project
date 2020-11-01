@@ -65,7 +65,7 @@ public class NetworkUtility {
         return true;
     }
 
-    public static boolean disconnect() {
+    public static void disconnect() {
         if (clientSocket != null && !clientSocket.isClosed()) {
             try {
                 clientSocket.close();
