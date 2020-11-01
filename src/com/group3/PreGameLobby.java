@@ -23,7 +23,11 @@ public class PreGameLobby extends JFrame {
     public PreGameLobby(boolean isHost, String name) {
         this.isHost = isHost;
         this.name = name;
+
         initializeGUI();
+
+        // this thread will be used to listen for the other player's name and to ready/start
+        new Thread(new Listener()).start();
     }
 
     private void initializeGUI() {
@@ -50,6 +54,8 @@ public class PreGameLobby extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (isHost) {
                     dispose();
+                    // this structure will show up a lot - if the read/write succeeds without error,
+                    //      then continue with the next part of the game. Else, assume failure and quit.
                     if (NetworkUtility.writeSocket("start"))
                         new HostGame();
                     else
@@ -89,15 +95,16 @@ public class PreGameLobby extends JFrame {
             }
         });
         setVisible(true);
-
-        new Thread(new Listener()).start();
     }
 
+
+    // this will be used to listen for the other player's name and to ready/start
     public class Listener implements Runnable {
 
         public Listener() { }
 
         public void run() {
+            // if is the host, wait for a client to connect
             if (isHost) {
                 if (NetworkUtility.hostServer())
                     status.setText("Waiting for your opponent to Ready up...");
@@ -108,6 +115,7 @@ public class PreGameLobby extends JFrame {
                 }
             }
 
+            // for both client and host, send the other your name and then receive the other's name
             NetworkUtility.writeSocket(name);
             String response = NetworkUtility.readSocket();
             if (response != null)
@@ -118,6 +126,7 @@ public class PreGameLobby extends JFrame {
                 return;
             }
 
+            // if the host, wait to receive client's ready-up message
             if (isHost) {
                 if (NetworkUtility.readSocket() != null) {
                     start.setEnabled(true);
@@ -128,6 +137,8 @@ public class PreGameLobby extends JFrame {
                     new MainMenu();
                 }
             }
+
+            // else the client, wait to receive the server's start message
             else {
                 if (NetworkUtility.readSocket() != null)
                     new ClientGame();
