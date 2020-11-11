@@ -11,7 +11,8 @@ import java.awt.event.WindowEvent;
 
 public class ClientGame extends GameFrame {
 
-    public ClientGame() {
+    public ClientGame(String player1Name, String player2Name) {
+        super(player1Name, player2Name);
         initializeGUI();
     }
 

@@ -58,7 +58,7 @@ public class PreGameLobby extends JFrame {
                     // this structure will show up a lot - if the read/write succeeds without error,
                     //      then continue with the next part of the game. Else, assume failure and quit.
                     if (NetworkUtility.writeSocket("start"))
-                        new HostGame();
+                        new HostGame(name, opponent_name.getText());
                     else
                         JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -142,7 +142,7 @@ public class PreGameLobby extends JFrame {
             // else the client, wait to receive the server's start message
             else {
                 if (NetworkUtility.readSocket() != null)
-                    new ClientGame();
+                    new ClientGame(name, opponent_name.getText());
                 else
                     JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 dispose();

@@ -11,7 +11,8 @@ import java.awt.event.WindowEvent;
 
 public class HostGame extends GameFrame {
 
-    public HostGame() {
+    public HostGame(String player1Name, String player2Name) {
+        super(player1Name, player2Name);
         initializeGUI();
     }
 
