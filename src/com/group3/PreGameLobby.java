@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -59,7 +60,7 @@ public class PreGameLobby extends JFrame {
                     if (NetworkUtility.writeSocket("start"))
                         new HostGame();
                     else
-                        new MainMenu();
+                        JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 else {
                     if (NetworkUtility.writeSocket("ready")) {
@@ -68,7 +69,7 @@ public class PreGameLobby extends JFrame {
                     }
                     else {
                         dispose();
-                        new MainMenu();
+                        JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -110,7 +111,7 @@ public class PreGameLobby extends JFrame {
                     status.setText("Waiting for your opponent to Ready up...");
                 else {
                     dispose();
-                    new MainMenu();
+                    JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -122,7 +123,7 @@ public class PreGameLobby extends JFrame {
                 opponent_name.setText(response);
             else {
                 dispose();
-                new MainMenu();
+                JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -134,7 +135,7 @@ public class PreGameLobby extends JFrame {
                 }
                 else {
                     dispose();
-                    new MainMenu();
+                    JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
@@ -143,7 +144,7 @@ public class PreGameLobby extends JFrame {
                 if (NetworkUtility.readSocket() != null)
                     new ClientGame();
                 else
-                    new MainMenu();
+                    JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 dispose();
             }
         }
