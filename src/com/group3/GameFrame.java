@@ -59,8 +59,10 @@ public class GameFrame extends JFrame {
 
     private class GraphicsPanel extends JPanel {
 
-        private final Font SMALL_FONT = new Font("Helvetica", Font.PLAIN, 15);
+        private final Font SMALL_FONT = new Font("Helvetica", Font.PLAIN, 18);
         private final Font BIG_FONT = new Font("Helvetica", Font.PLAIN, 30);
+        private final int CARD_WIDTH = 243;
+        private final int CARD_HEIGHT = 340;
 
         GraphicsPanel() {
             super();
@@ -82,7 +84,7 @@ public class GameFrame extends JFrame {
 
             g2d.setColor(Color.BLACK);
             // Draw Player 1 Info
-            int hPadding = 50, vPadding = 50;
+            int hPadding = 30, vPadding = 30;
             int x = 0, y = 0;
 
 
@@ -90,9 +92,14 @@ public class GameFrame extends JFrame {
             x = 0; y = 0;
             g2d.setFont(BIG_FONT);
             g2d.drawString(player2Name, x += hPadding, y += vPadding);
-            g2d.drawImage(getImage("back.png"), x += hPadding*5, y += vPadding, this);
+            g2d.drawImage(getImage("back.png"), x += hPadding*5, y += (int)(0.5*vPadding), this);
+            g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+            g2d.drawImage(getImage("back.png"), x += hPadding, y, this);
+            g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+            g2d.drawImage(getImage("back.png"), x += hPadding, y, this);
+            g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
             g2d.setFont(SMALL_FONT);
-
+            g2d.drawString("Hand", x += (int)(CARD_WIDTH/3.2), y -= (int)(0.5*vPadding));
         }
 
     }
