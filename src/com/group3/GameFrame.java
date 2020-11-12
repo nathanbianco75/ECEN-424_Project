@@ -8,13 +8,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 
-public class GameFrame extends JFrame {
+public class GameFrame extends JFrame implements ActionListener{
 
     private GraphicsPanel graphicsPanel;
     protected String player1Name;
     protected String player2Name;
-    protected final int FRAME_WIDTH = 1920;
-    protected final int FRAME_HEIGHT = 1080;
+    protected final int FRAME_WIDTH = 1080;
+    protected final int FRAME_HEIGHT = 720;
+    protected JButton next;
 
 
     public GameFrame(String player1Name, String player2Name) {
@@ -27,7 +28,7 @@ public class GameFrame extends JFrame {
     protected void initializeGUI() {
         graphicsPanel = new GraphicsPanel();
 
-        JButton next = new JButton("Next");
+        next = new JButton("Flip");
 
         JButton quit = new JButton("Quit");
         quit.addActionListener(new ActionListener() {
@@ -58,6 +59,11 @@ public class GameFrame extends JFrame {
         });
         setVisible(true);
         graphicsPanel.repaint();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
     }
 
     private class GraphicsPanel extends JPanel {
