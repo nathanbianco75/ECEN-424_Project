@@ -41,7 +41,7 @@ public class GameFrame extends JFrame {
 
         add(BorderLayout.CENTER, graphicsPanel);
         add(BorderLayout.SOUTH, content);
-        setSize(1600, 900);
+        setSize(1920, 1080);
         setResizable(false);
         setLocationRelativeTo(null);
         setTitle("Game Frame");

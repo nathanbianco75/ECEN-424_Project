@@ -21,4 +21,5 @@ public class ClientGame extends GameFrame {
         super.initializeGUI();
         setTitle("Client Game");
     }
+
 }
