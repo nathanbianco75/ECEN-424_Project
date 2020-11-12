@@ -1,11 +1,12 @@
 package com.group3;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -16,6 +17,7 @@ public class EnterName extends JFrame {
     private boolean isHost;
 
     public EnterName(boolean isHost) {
+        super();
         this.isHost = isHost;
         initializeGUI();
     }
@@ -33,11 +35,23 @@ public class EnterName extends JFrame {
         });
 
         JPanel content = new JPanel();
-        content.add(new JLabel("Player Name:"));
-        content.add(name);
-        content.add(accept);
+        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(40, 0, 40, 0);
+        JPanel buttons = new JPanel(new GridBagLayout());
+        JPanel names = new JPanel();
+        names.add(new JLabel("Player Name:"));
+        names.add(name);
+        buttons.add(names, gbc);
+        buttons.add(accept, gbc);
+        gbc.weighty = 1;
+        content.add(buttons, gbc);
 
-        add(BorderLayout.CENTER, content);
+        add(content);
         setSize(500, 400);
         setResizable(false);
         setLocationRelativeTo(null);

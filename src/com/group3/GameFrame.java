@@ -18,6 +18,7 @@ public class GameFrame extends JFrame {
 
 
     public GameFrame(String player1Name, String player2Name) {
+        super();
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         initializeGUI();

@@ -1,16 +1,18 @@
 package com.group3;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Tutorial extends JFrame {
 
     public Tutorial(JButton tutorial) {
+        super();
         initializeGUI(tutorial);
     }
 
@@ -32,10 +34,21 @@ public class Tutorial extends JFrame {
         });
 
         JPanel content = new JPanel();
-        content.add(text);
-        content.add(close);
+        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(40, 0, 20, 0);
+        content.add(text, gbc);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel buttons = new JPanel(new GridBagLayout());
+        gbc.anchor = GridBagConstraints.SOUTH;
+        buttons.add(close, gbc);
+        gbc.weighty = 1;
+        content.add(buttons, gbc);
 
-        add(BorderLayout.CENTER, content);
+        add(content);
         setSize(500, 600);
         setResizable(false);
         setLocationRelativeTo(null);

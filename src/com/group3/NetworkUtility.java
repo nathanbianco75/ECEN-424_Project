@@ -12,6 +12,7 @@ import java.net.URL;
 
 public class NetworkUtility {
     private static final int PORT = 25565; // or whatever we want it to be. this was just a joke.
+    private static ServerSocket serverSocket;
     private static Socket clientSocket;
     private static PrintWriter writer;
     private static BufferedReader reader;
@@ -20,7 +21,7 @@ public class NetworkUtility {
     //      Return true if client connected successfully, false if exception occurred
     public static boolean hostServer() {
         disconnect();
-        ServerSocket serverSocket = null;
+        serverSocket = null;
         try {
             serverSocket = new ServerSocket(PORT);
             clientSocket = serverSocket.accept();
@@ -96,6 +97,15 @@ public class NetworkUtility {
                 e.printStackTrace();
             }
             clientSocket = null;
+        }
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                System.out.println("Error closing serverSocket:");
+                e.printStackTrace();
+            }
+            serverSocket = null;
         }
     }
 

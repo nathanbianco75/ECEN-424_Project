@@ -2,12 +2,13 @@ package com.group3;
 
 import com.sun.tools.javac.Main;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -20,13 +21,13 @@ public class PreGameLobby extends JFrame {
     protected JButton start;
     protected JLabel opponent_name;
     protected JLabel status;
+    protected boolean forceClose = false;
 
     public PreGameLobby(boolean isHost, String name) {
+        super();
         this.isHost = isHost;
         this.name = name;
-
         initializeGUI();
-
         // this thread will be used to listen for the other player's name and to ready/start
         new Thread(new Listener()).start();
     }
@@ -59,15 +60,15 @@ public class PreGameLobby extends JFrame {
                     //      then continue with the next part of the game. Else, assume failure and quit.
                     if (NetworkUtility.writeSocket("start"))
                         new HostGame(name, opponent_name.getText());
-                    else
-                        JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
+//                    else if (!forceClose)
+//                        JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 else {
                     if (NetworkUtility.writeSocket("ready")) {
                         start.setEnabled(false);
                         status.setText("Waiting for the host to start the game...");
                     }
-                    else {
+                    else if (!forceClose) {
                         dispose();
                         JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -76,13 +77,32 @@ public class PreGameLobby extends JFrame {
         });
 
         JPanel content = new JPanel();
+        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(5, 0, 5, 0);
+        content.add(new JLabel("<html><p><strong><i>Pre-Game Lobby</i></strong></p><hr></html>"), gbc);
+        content.add(new JLabel(" "), gbc);
+        content.add(new JLabel("Your Local IP Address is: " + NetworkUtility.getLocalIP()), gbc);
+        content.add(new JLabel("Your External IP Address is: " + NetworkUtility.getExternalIP()), gbc);
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel buttons = new JPanel(new GridBagLayout());
         for (int i = 0; i < numPlayers; i++) {
-            content.add(playerNames[i]);
+            JPanel name = new JPanel();
+            name.add(new JLabel("Player " + (i+1) + " Name: "));
+            name.add(playerNames[i]);
+            buttons.add(name, gbc);
         }
-        content.add(status);
-        content.add(start);
+        buttons.add(new JLabel(" "), gbc);
+        buttons.add(status, gbc);
+        buttons.add(start, gbc);
+        gbc.weighty = 1;
+        content.add(buttons, gbc);
 
-        add(BorderLayout.CENTER, content);
+        add(content);
         setSize(500, 600);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -92,6 +112,8 @@ public class PreGameLobby extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
+                forceClose = true;
+                NetworkUtility.disconnect();
                 new MainMenu();
             }
         });
@@ -109,7 +131,7 @@ public class PreGameLobby extends JFrame {
             if (isHost) {
                 if (NetworkUtility.hostServer())
                     status.setText("Waiting for your opponent to Ready up...");
-                else {
+                else if (!forceClose) {
                     dispose();
                     JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
@@ -121,7 +143,7 @@ public class PreGameLobby extends JFrame {
             String response = NetworkUtility.readSocket();
             if (response != null)
                 opponent_name.setText(response);
-            else {
+            else if (!forceClose) {
                 dispose();
                 JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -133,7 +155,7 @@ public class PreGameLobby extends JFrame {
                     start.setEnabled(true);
                     status.setText("Waiting for you to start the game...");
                 }
-                else {
+                else if (!forceClose) {
                     dispose();
                     JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -143,7 +165,7 @@ public class PreGameLobby extends JFrame {
             else {
                 if (NetworkUtility.readSocket() != null)
                     new ClientGame(name, opponent_name.getText());
-                else
+                else if (!forceClose)
                     JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
                 dispose();
             }
