@@ -7,15 +7,31 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
+import java.util.ArrayList;
+
 
 public class GameFrame extends JFrame implements ActionListener{
 
-    private GraphicsPanel graphicsPanel;
+    protected GraphicsPanel graphicsPanel;
     protected String player1Name;
     protected String player2Name;
-    protected final int FRAME_WIDTH = 1080;
-    protected final int FRAME_HEIGHT = 720;
+    protected final int FRAME_WIDTH = 1920;
+    protected final int FRAME_HEIGHT = 1080;
     protected JButton next;
+    public ArrayList<String> cards = new ArrayList<String>();
+    public ArrayList<String> clientCards = new ArrayList<String>();
+    public ArrayList<String> hostCards = new ArrayList<String>();
+    public ArrayList<String> clientWinPile = new ArrayList<String>();
+    public ArrayList<String> hostWinPile = new ArrayList<String>();
+    public ArrayList<String> warPile = new ArrayList<String>();
+    public ArrayList<String> clientwarPile = new ArrayList<String>();
+    public ArrayList<String> hostwarPile = new ArrayList<String>();
+    public int clientRank;
+    public int hostRank;
+    public char clientFlipped;
+    public char hostFlipped;
+    public String topClientCard, topHostCard;
+    public boolean war = false;
 
 
     public GameFrame(String player1Name, String player2Name) {
@@ -66,7 +82,7 @@ public class GameFrame extends JFrame implements ActionListener{
 
     }
 
-    private class GraphicsPanel extends JPanel {
+    protected class GraphicsPanel extends JPanel {
 
         private final Font SMALL_FONT = new Font("Helvetica", Font.PLAIN, 18);
         private final Font BIG_FONT = new Font("Helvetica", Font.PLAIN, 30);
@@ -100,107 +116,108 @@ public class GameFrame extends JFrame implements ActionListener{
             g2d.drawString(player1Name, x += X_PAD, y - (int)(Y_PAD*2.0));
             y -= CARD_HEIGHT + (int)(Y_PAD*1.1);
             g2d.setFont(SMALL_FONT);
-            // if (hand1.length() > 0) {
+            if (hostCards.size() > 0) {
                 g2d.drawImage(getImage("back.png"), x += X_PAD*12, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Hand", x + CARD_WIDTH - (int)(X_PAD*4.5), y + Y_PAD + CARD_HEIGHT);
-            // }
-            // if (hand1.length() > 1) {
+            }
+            if (hostCards.size() > 1) {
                 g2d.drawImage(getImage("back.png"), x + X_PAD, y, this);
                 g2d.drawRect(x + X_PAD, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (hand1.length() > 2) {
+            }
+            if (hostCards.size() > 2) {
                 g2d.drawImage(getImage("back.png"), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
+            }
             x += CARD_WIDTH + X_PAD*3;
-            // if (flipCard1 != null) {
-                g2d.drawImage(getImage("spades_10.png"), x, y, this);
+            if (topHostCard != null) {
+                g2d.drawImage(getImage(topHostCard), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Flip Card", x + X_PAD*3, y + Y_PAD + CARD_HEIGHT);
-            // }
+            }
             x += CARD_WIDTH + X_PAD*4;
-            // if (warCards1.length() > 2) {
+            if (hostwarPile.size() > 2) {
                 g2d.drawImage(getImage("back.png"), x, y - Y_PAD*2, this);
                 g2d.drawRect(x, y - Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (warCards1.length() > 1) {
+            }
+            if (hostwarPile.size() > 1) {
                 g2d.drawImage(getImage("back.png"), x, y - Y_PAD, this);
                 g2d.drawRect(x, y - Y_PAD, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (warCards1.length() > 0) {
-                g2d.drawImage(getImage("hearts_Q.png"), x, y, this);
+            }
+            if (hostwarPile.size() > 0) {
+                g2d.drawImage(getImage(hostwarPile.get(0)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("War", x + X_PAD*3, y + Y_PAD + CARD_HEIGHT);
-            // }
+            }
             x += CARD_WIDTH + X_PAD*4;
-            // if (winPile1.length() > 0) {
-                g2d.drawImage(getImage("spades_A.png"), x, y, this);
+            if (hostWinPile.size() > 0) {
+                g2d.drawImage(getImage(hostWinPile.get(0)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y + Y_PAD + CARD_HEIGHT);
-            // }
-            // if (winPile1.length() > 1) {
-                g2d.drawImage(getImage("clubs_10.png"), x + X_PAD*2, y, this);
+            }
+            if (hostWinPile.size() > 1) {
+                g2d.drawImage(getImage(hostWinPile.get(1)), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (winPile1.length() > 2) {
-                g2d.drawImage(getImage("diamonds_2.png"), x + X_PAD*4, y, this);
+            }
+            if (hostWinPile.size() > 2) {
+                g2d.drawImage(getImage(hostWinPile.get(2)), x + X_PAD*4, y, this);
                 g2d.drawRect(x + X_PAD*4, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
+            }
 
             // Draw Player 2 Info
             x = 0; y = Y_PAD;
             g2d.setFont(BIG_FONT);
             g2d.drawString(player2Name, x += X_PAD, (y += (int)(Y_PAD*1.5)) + (int)(Y_PAD*1.8));
             g2d.setFont(SMALL_FONT);
-            // if (hand2.length() > 0) {
+            if (clientCards.size() > 0) {
                 g2d.drawImage(getImage("back.png"), x += X_PAD*12, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Hand", x + CARD_WIDTH - (int)(X_PAD*4.5), y - (int)(Y_PAD*0.5));
-            // }
-            // if (hand2.length() > 1) {
+            }
+            if (clientCards.size() > 1) {
                 g2d.drawImage(getImage("back.png"), x + X_PAD, y, this);
                 g2d.drawRect(x + X_PAD, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (hand2.length() > 2) {
+            }
+            if (clientCards.size() > 2) {
                 g2d.drawImage(getImage("back.png"), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
+            }
             x += CARD_WIDTH + X_PAD*3;
-            // if (flipCard2 != null) {
-                g2d.drawImage(getImage("hearts_7.png"), x, y, this);
+            if (topClientCard != null) {
+                g2d.drawImage(getImage(topClientCard), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Flip Card", x + X_PAD*3, y - (int)(Y_PAD*0.5));
-            // }
+            }
             x += CARD_WIDTH + X_PAD*4;
-            // if (warCards2.length() > 2) {
+            if (clientwarPile.size() > 2) {
                 g2d.drawImage(getImage("back.png"), x, y + Y_PAD*2, this);
                 g2d.drawRect(x, y + Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (warCards2.length() > 1) {
+            }
+            if (clientwarPile.size() > 1) {
                 g2d.drawImage(getImage("back.png"), x, y + Y_PAD, this);
                 g2d.drawRect(x, y + Y_PAD, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (warCards2.length() > 0) {
-                g2d.drawImage(getImage("clubs_K.png"), x, y, this);
+            }
+            if (clientwarPile.size() > 0) {
+                g2d.drawImage(getImage(clientwarPile.get(0)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("War", x + X_PAD*3, y - (int)(Y_PAD*0.5));
-            // }
+            }
             x += CARD_WIDTH + X_PAD*4;
-            // if (winPile2.length() > 0) {
-                g2d.drawImage(getImage("diamonds_A.png"), x, y, this);
+            if (clientWinPile.size() > 0) {
+                g2d.drawImage(getImage(clientWinPile.get(0)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
                 g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y - (int)(Y_PAD*0.5));
-            // }
-            // if (winPile2.length() > 1) {
-                g2d.drawImage(getImage("clubs_2.png"), x + X_PAD*2, y, this);
+            }
+            if (clientWinPile.size() > 1) {
+                g2d.drawImage(getImage(clientWinPile.get(1)), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
-            // if (winPile2.length() > 2) {
-                g2d.drawImage(getImage("hearts_4.png"), x + X_PAD*4, y, this);
+            }
+            if (clientWinPile.size() > 2) {
+                g2d.drawImage(getImage(clientWinPile.get(2)), x + X_PAD*4, y, this);
                 g2d.drawRect(x + X_PAD*4, y, CARD_WIDTH, CARD_HEIGHT);
-            // }
+            }
         }
 
     }
+
 }

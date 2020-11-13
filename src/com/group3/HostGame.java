@@ -16,17 +16,8 @@ import java.io.*;
 
 public class HostGame extends GameFrame {
 
-    public ArrayList<String> cards = new ArrayList<String>();
-    public ArrayList<String> clientCards = new ArrayList<String>();
-    public ArrayList<String> hostCards = new ArrayList<String>();
-    public ArrayList<String> clientWinPile = new ArrayList<String>();
-    public ArrayList<String> hostWinPile = new ArrayList<String>();
-    public ArrayList<String> warPile = new ArrayList<String>();
     public int clientRank;
     public int hostRank;
-    public char clientFlipped;
-    public char hostFlipped;
-    public static String topClientCard, topHostCard;
     protected boolean clientCardFlipped;
     protected boolean hostCardFlipped;
 
@@ -45,187 +36,209 @@ public class HostGame extends GameFrame {
     protected void initializeGUI() {
         super.initializeGUI();
         setTitle("Host Game");
-        this.next.addActionListener(this);
-        this.playGame();
-
-        if (this.clientCards.isEmpty() && this.clientWinPile.isEmpty()) {
-            System.out.println("Host won");
-            NetworkUtility.writeSocket("Host won");
-        }
-        else if (this.hostCards.isEmpty() && this.hostWinPile.isEmpty()) {
-            System.out.println("Client won");
-            NetworkUtility.writeSocket("Client won");
-        }
+        next.addActionListener(this);
+        Thread game = new Thread(new playGame());
+        game.start();/*
+        try {
+            game.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
     }
     
     public void playGame() {
-        this.cards = new ArrayList<>();
+        cards = new ArrayList<>();
         for (int i = 2; i < 11; i++) {
-            this.cards.add("clubs_" + i + ".png");
-            this.cards.add("diamonds_" + i + ".png");
-            this.cards.add("hearts_" + i + ".png");
-            this.cards.add("spades_" + i + ".png");
+            cards.add("clubs_" + i + ".png");
+            cards.add("diamonds_" + i + ".png");
+            cards.add("hearts_" + i + ".png");
+            cards.add("spades_" + i + ".png");
         }
-        this.cards.add("clubs_A.png");
-        this.cards.add("clubs_J.png");
-        this.cards.add("clubs_Q.png");
-        this.cards.add("clubs_K.png");
-        this.cards.add("diamonds_A.png");
-        this.cards.add("diamonds_J.png");
-        this.cards.add("diamonds_Q.png");
-        this.cards.add("diamonds_K.png");
-        this.cards.add("hearts_A.png");
-        this.cards.add("hearts_J.png");
-        this.cards.add("hearts_Q.png");
-        this.cards.add("hearts_K.png");
-        this.cards.add("spades_A.png");
-        this.cards.add("spades_J.png");
-        this.cards.add("spades_Q.png");
-        this.cards.add("spades_K.png");
-        Collections.shuffle(this.cards);
-        System.out.println(this.cards);
-        this.clientCards = new ArrayList<>();
-        this.hostCards = new ArrayList<>();
+        cards.add("clubs_A.png");
+        cards.add("clubs_J.png");
+        cards.add("clubs_Q.png");
+        cards.add("clubs_K.png");
+        cards.add("diamonds_A.png");
+        cards.add("diamonds_J.png");
+        cards.add("diamonds_Q.png");
+        cards.add("diamonds_K.png");
+        cards.add("hearts_A.png");
+        cards.add("hearts_J.png");
+        cards.add("hearts_Q.png");
+        cards.add("hearts_K.png");
+        cards.add("spades_A.png");
+        cards.add("spades_J.png");
+        cards.add("spades_Q.png");
+        cards.add("spades_K.png");
+        Collections.shuffle(cards);
+        System.out.println(cards);
+        clientCards = new ArrayList<>();
+        hostCards = new ArrayList<>();
         for (int i = 0; i < 26; i++) {
-            this.clientCards.add(this.cards.get(i));
-            this.hostCards.add(this.cards.get(i+26));
+            clientCards.add(cards.get(i));
+            hostCards.add(cards.get(i+26));
         }
         while(true) {
-            while(NetworkUtility.readSocket()==null) {
+            if(NetworkUtility.readSocket()!=null) {
 
             }
-            this.clientCardFlipped = true;
-            while(!this.hostCardFlipped);
-            this.flipCards();
-            this.clientCardFlipped = false;
-            this.hostCardFlipped = false;
-            if (this.clientCards.isEmpty() && this.clientWinPile.isEmpty()) { //Host won
+            clientCardFlipped = true;
+            while(!hostCardFlipped);
+            flipCards();
+            clientCardFlipped = false;
+            hostCardFlipped = false;
+            if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
                 break;
             }
-            if (this.hostCards.isEmpty() && this.hostWinPile.isEmpty()) { //Client won
+            if (hostCards.isEmpty() && hostWinPile.isEmpty()) { //Client won
                 break;
             }
+            graphicsPanel.repaint();
             NetworkUtility.writeSocket("NextState");
         }
     }
 
     public void flipCards() {
-        if (!this.clientCards.isEmpty() && !this.hostCards.isEmpty() && !this.clientWinPile.isEmpty() && !this.hostWinPile.isEmpty()) {
-            this.clientFlipped = this.clientCards.get(0).charAt(this.clientCards.get(0).length()-5);
-            this.hostFlipped = this.hostCards.get(0).charAt(this.hostCards.get(0).length()-5);
-            this.topClientCard = this.clientCards.get(0);
-            NetworkUtility.writeSocket(this.topClientCard);
-            this.topHostCard = this.hostCards.get(0);
-            NetworkUtility.writeSocket(this.topHostCard);
-            this.getRanks();
-            if(this.clientRank > this.hostRank) {
-                this.clientWinPile.add(this.clientCards.get(0));
-                this.clientWinPile.add(this.hostCards.get(0));
-                this.clientCards.remove(0);
-                this.hostCards.remove(0);
+        if (!clientCards.isEmpty() && !hostCards.isEmpty() && !clientWinPile.isEmpty() && !hostWinPile.isEmpty()) {
+            clientFlipped = clientCards.get(0).charAt(clientCards.get(0).length()-5);
+            hostFlipped = hostCards.get(0).charAt(hostCards.get(0).length()-5);
+            topClientCard = clientCards.get(0);
+            NetworkUtility.writeSocket(topClientCard);
+            topHostCard = hostCards.get(0);
+            NetworkUtility.writeSocket(topHostCard);
+            getRanks();
+            if(clientRank > hostRank) {
+                clientWinPile.add(clientCards.get(0));
+                clientWinPile.add(hostCards.get(0));
+                clientCards.remove(0);
+                hostCards.remove(0);
             }
-            else if(this.hostRank > this.clientRank){
-                this.hostWinPile.add(this.clientCards.get(0));
-                this.hostWinPile.add(this.hostCards.get(0));
-                this.clientCards.remove(0);
-                this.hostCards.remove(0);
+            else if(hostRank > clientRank){
+                hostWinPile.add(clientCards.get(0));
+                hostWinPile.add(hostCards.get(0));
+                clientCards.remove(0);
+                hostCards.remove(0);
             }
-            while (this.hostRank == this.clientRank && !this.clientCards.isEmpty() && !this.hostCards.isEmpty() && !this.clientWinPile.isEmpty() && !this.hostWinPile.isEmpty()) { //war prob infinite
-                if (this.clientCards.isEmpty()){
-                    this.clientCards.addAll(this.clientWinPile);
-                    this.clientWinPile = new ArrayList<>();
+            while (hostRank == clientRank && !clientCards.isEmpty() && !hostCards.isEmpty() && !clientWinPile.isEmpty() && !hostWinPile.isEmpty()) { //war prob infinite
+                war = true;
+                if (clientCards.isEmpty()){
+                    clientCards.addAll(clientWinPile);
+                    clientWinPile = new ArrayList<>();
                 }
-                if (this.hostCards.isEmpty()){
-                    this.hostCards.addAll(hostWinPile);
-                    this.hostWinPile = new ArrayList<>();
+                if (hostCards.isEmpty()){
+                    hostCards.addAll(hostWinPile);
+                    hostWinPile = new ArrayList<>();
                 }
                 for(int i = 0; i < 3; i++) {
-                    if (this.clientCards.isEmpty() && this.clientWinPile.isEmpty()) { //Host won
+                    if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
                         break;
                     }
-                    else if (this.clientCards.isEmpty()) {
-                        this.clientCards.addAll(this.clientWinPile);
-                        this.clientWinPile = new ArrayList<>();
+                    else if (clientCards.isEmpty()) {
+                        clientCards.addAll(clientWinPile);
+                        clientWinPile = new ArrayList<>();
                     }
-                    if (this.hostCards.isEmpty() && this.hostWinPile.isEmpty()) { //Client won
+                    if (hostCards.isEmpty() && hostWinPile.isEmpty()) { //Client won
                         break;
                     }
-                    else if (this.hostCards.isEmpty()) {
-                        this.hostCards.addAll(this.hostWinPile);
-                        this.hostWinPile = new ArrayList<>();
+                    else if (hostCards.isEmpty()) {
+                        hostCards.addAll(hostWinPile);
+                        hostWinPile = new ArrayList<>();
                     }
-                    this.warPile.add(this.clientCards.get(0));
-                    this.warPile.add(this.hostCards.get(0));
-                    this.clientCards.remove(0);
-                    this.hostCards.remove(0);
+                    warPile.add(clientCards.get(0));
+                    warPile.add(hostCards.get(0));
+                    clientwarPile.add(clientCards.get(0));
+                    hostwarPile.add(hostCards.get(0));
+                    clientCards.remove(0);
+                    hostCards.remove(0);
                 }
-                if (this.clientCards.isEmpty() && this.clientWinPile.isEmpty()) { //Host won
+                if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
                     break;
                 }
-                else if (this.clientCards.isEmpty()) {
-                    this.clientCards.addAll(clientWinPile);
-                    this.clientWinPile = new ArrayList<>();
+                else if (clientCards.isEmpty()) {
+                    clientCards.addAll(clientWinPile);
+                    clientWinPile = new ArrayList<>();
                 }
-                if (this.hostCards.isEmpty() && this.hostWinPile.isEmpty()) { //Client won
+                if (hostCards.isEmpty() && hostWinPile.isEmpty()) { //Client won
                     break;
                 }
-                else if (this.hostCards.isEmpty()) {
-                    this.hostCards.addAll(this.hostWinPile);
-                    this.hostWinPile = new ArrayList<>();
+                else if (hostCards.isEmpty()) {
+                    hostCards.addAll(hostWinPile);
+                    hostWinPile = new ArrayList<>();
                 }
-                this.clientFlipped = this.clientCards.get(0).charAt(this.clientCards.get(0).length()-5);
-                this.hostFlipped = this.hostCards.get(0).charAt(this.hostCards.get(0).length()-5);
-                this.getRanks();
-                this.warPile.add(this.clientCards.get(0));
-                this.warPile.add(this.hostCards.get(0));
-                this.topClientCard = clientCards.get(0);
-                NetworkUtility.writeSocket("WAR: " + this.topClientCard);
-                this.topHostCard = this.hostCards.get(0);
-                NetworkUtility.writeSocket("WAR: " + this.topHostCard);
-                this.clientCards.remove(0);
-                this.hostCards.remove(0);
+                clientFlipped = clientCards.get(0).charAt(clientCards.get(0).length()-5);
+                hostFlipped = hostCards.get(0).charAt(hostCards.get(0).length()-5);
+                getRanks();
+                warPile.add(clientCards.get(0));
+                warPile.add(hostCards.get(0));
+                clientwarPile.add(clientCards.get(0));
+                hostwarPile.add(hostCards.get(0));
+                topClientCard = clientCards.get(0);
+                NetworkUtility.writeSocket("WAR: " + topClientCard);
+                topHostCard = hostCards.get(0);
+                NetworkUtility.writeSocket("WAR: " + topHostCard);
+                clientCards.remove(0);
+                hostCards.remove(0);
             }
-            if(this.hostRank > this.clientRank) {
-                this.hostWinPile.addAll(this.warPile);
-                this.warPile = new ArrayList<String>();
+            if(hostRank > clientRank) {
+                hostWinPile.addAll(warPile);
+                warPile = new ArrayList<String>();
             }
-            else if(this.clientRank > this.hostRank) {
-                this.clientWinPile.addAll(this.warPile);
-                this.warPile = new ArrayList<String>();
+            else if(clientRank > hostRank) {
+                clientWinPile.addAll(warPile);
+                warPile = new ArrayList<String>();
             }
         }
     }
 
     public void getRanks() {
-        if(this.clientFlipped >= '2' && this.clientFlipped <= '9'){
-            this.clientRank = Character.getNumericValue(clientFlipped);
+        if(clientFlipped >= '2' && clientFlipped <= '9'){
+            clientRank = Character.getNumericValue(clientFlipped);
         }
         else {
-            switch (this.clientFlipped) {
-                case 'A' -> this.clientRank = 14;
-                case '0' -> this.clientRank = 10;//10
-                case 'J' -> this.clientRank = 11;
-                case 'Q' -> this.clientRank = 12;
-                case 'K' -> this.clientRank = 13;
+            switch (clientFlipped) {
+                case 'A' -> clientRank = 14;
+                case '0' -> clientRank = 10;//10
+                case 'J' -> clientRank = 11;
+                case 'Q' -> clientRank = 12;
+                case 'K' -> clientRank = 13;
             }
         }
-        if(this.hostFlipped >= '2' && this.hostFlipped <= '9'){
-            this.hostRank = Character.getNumericValue(hostFlipped);
+        if(hostFlipped >= '2' && hostFlipped <= '9'){
+            hostRank = Character.getNumericValue(hostFlipped);
         }
         else {
-            switch (this.hostFlipped) {
-                case 'A' -> this.hostRank = 14;
-                case '0' -> this.hostRank = 10;//10
-                case 'J' -> this.hostRank = 11;
-                case 'Q' -> this.hostRank = 12;
-                case 'K' -> this.hostRank = 13;
+            switch (hostFlipped) {
+                case 'A' -> hostRank = 14;
+                case '0' -> hostRank = 10;//10
+                case 'J' -> hostRank = 11;
+                case 'Q' -> hostRank = 12;
+                case 'K' -> hostRank = 13;
             }
         }
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==this.next)
-            this.hostCardFlipped = true;
+        if(e.getSource()==next) {
+            hostCardFlipped = true;
+            NetworkUtility.writeSocket("Flipped");
+        }
+    }
+
+    public class playGame implements Runnable {
+
+        public playGame() { }
+
+        public void run() {
+            playGame();
+            if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
+                System.out.println("Host won");
+                NetworkUtility.writeSocket("Host won");
+            }
+            else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
+                System.out.println("Client won");
+                NetworkUtility.writeSocket("Client won");
+            }
+        }
     }
 
 }
