@@ -28,7 +28,7 @@ public class HostGame extends GameFrame implements ActionListener{
         initializeGUI();
     }
 
-//    @Override
+    @Override
     protected void initializeGUI() {
         super.initializeGUI();
         setTitle("Host Game");
@@ -90,12 +90,20 @@ public class HostGame extends GameFrame implements ActionListener{
         System.out.println(clientCards);
         System.out.println(hostCards);
         while(true) {
+            System.out.println("1st While");
             if(NetworkUtility.readSocket()!=null) {
 
             }
+            System.out.println("1st if");
             clientCardFlipped = true;
-            while(!hostCardFlipped);
+            while(!hostCardFlipped) {
+                ;
+            }
+            System.out.println("2nd While");
+
             flipCards();
+            System.out.println("Flip cards");
+
             clientCardFlipped = false;
             hostCardFlipped = false;
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
@@ -105,8 +113,9 @@ public class HostGame extends GameFrame implements ActionListener{
                 break;
             }
             graphicsPanel.repaint();
-//            next.setEnabled(true);
-            NetworkUtility.writeSocket("NextState");
+            System.out.println("Repaint");
+            next.setEnabled(true);
+            //NetworkUtility.writeSocket("NextState");
         }
     }
 
@@ -128,11 +137,11 @@ public class HostGame extends GameFrame implements ActionListener{
             playGame();
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
                 System.out.println("Host won");
-                NetworkUtility.writeSocket("Host won");
+                //NetworkUtility.writeSocket("Host won");
             }
             else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
                 System.out.println("Client won");
-                NetworkUtility.writeSocket("Client won");
+                //NetworkUtility.writeSocket("Client won");
             }
         }
     }

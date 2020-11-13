@@ -77,16 +77,20 @@ public class ClientGame extends GameFrame implements ActionListener{
         s = NetworkUtility.readSocket();
         hostCards = new ArrayList<String> (Arrays.asList(s.substring(1, s.length() - 1).split(", ")));
 
-        System.out.println(clientCards);
-        System.out.println(hostCards);
+        System.out.println("Client Cards" + clientCards);
+        System.out.println("Host Cards" + hostCards);
 
         while(true) {
+            System.out.println("1st While");
             if (NetworkUtility.readSocket() != null) {
 
             }
+            System.out.println("1st if");
             hostCardFlipped = true;
             while (!clientCardFlipped) ;
+            System.out.println("2nd While");
             flipCards();
+            System.out.println("Flip Cards");
             clientCardFlipped = false;
             hostCardFlipped = false;
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
@@ -96,7 +100,8 @@ public class ClientGame extends GameFrame implements ActionListener{
                 break;
             }
             graphicsPanel.repaint();
-//            next.setEnabled(true);
+            System.out.println("repaint");
+            next.setEnabled(true);
         }
 
         /*while (!brk) {
@@ -139,11 +144,11 @@ public class ClientGame extends GameFrame implements ActionListener{
             playGame();
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
                 System.out.println("Host won");
-                NetworkUtility.writeSocket("Host won");
+                //NetworkUtility.writeSocket("Host won");
             }
             else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
                 System.out.println("Client won");
-                NetworkUtility.writeSocket("Client won");
+                //NetworkUtility.writeSocket("Client won");
             }
         }
     }
