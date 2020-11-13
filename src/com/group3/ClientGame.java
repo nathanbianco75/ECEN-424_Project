@@ -12,7 +12,7 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class ClientGame extends GameFrame {
+public class ClientGame extends GameFrame implements ActionListener{
     public boolean brk = false;
   /*  private DataInputStream  input   = null;
     private DataOutputStream out     = null;
@@ -28,7 +28,16 @@ public class ClientGame extends GameFrame {
     @Override
     protected void initializeGUI() {
         super.initializeGUI();
-        next.addActionListener(this);
+        next.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                System.out.println("Client clicked next");
+                next.setEnabled(false);
+                clientCardFlipped = true;
+                NetworkUtility.writeSocket("Flipped");
+            }
+        });
         setTitle("Client Game");
         Thread game = new Thread(new playGame());
         game.start();
@@ -71,7 +80,26 @@ public class ClientGame extends GameFrame {
         System.out.println(clientCards);
         System.out.println(hostCards);
 
-        while (!brk) {
+        while(true) {
+            if (NetworkUtility.readSocket() != null) {
+
+            }
+            hostCardFlipped = true;
+            while (!clientCardFlipped) ;
+            flipCards();
+            clientCardFlipped = false;
+            hostCardFlipped = false;
+            if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
+                break;
+            }
+            if (hostCards.isEmpty() && hostWinPile.isEmpty()) { //Client won
+                break;
+            }
+            graphicsPanel.repaint();
+//            next.setEnabled(true);
+        }
+
+        /*while (!brk) {
             String message = NetworkUtility.readSocket();
             if (message.startsWith("WAR:")) {//WAR
                 war = true;
@@ -89,17 +117,19 @@ public class ClientGame extends GameFrame {
             }
             graphicsPanel.repaint();
             next.setEnabled(true);
-        }
+        }*/
     }
 
 
-    public void actionPerformed(ActionEvent e) {
+
+    /*public void actionPerformed(ActionEvent e) {
         if(e.getSource()==next) {
             System.out.println("Client clicked next");
             next.setEnabled(false);
             NetworkUtility.writeSocket("Flipped");
+            clientCardFlipped = true;
         }
-    }
+    }*/
 
     public class playGame implements Runnable {
 
