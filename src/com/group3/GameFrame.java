@@ -34,6 +34,9 @@ public class GameFrame extends JFrame {
     public boolean war = false;
     protected boolean clientCardFlipped;
     protected boolean hostCardFlipped;
+    protected String clientWonWar = "";
+    protected String hostWonWar = "";
+    protected boolean drawWarCards = false;
 
 
     public GameFrame(String player1Name, String player2Name) {
@@ -72,6 +75,7 @@ public class GameFrame extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
+                NetworkUtility.disconnect();
                 new MainMenu();
             }
         });
@@ -80,7 +84,16 @@ public class GameFrame extends JFrame {
     }
 
     public void flipCards() {
-        if (!clientCards.isEmpty() && !hostCards.isEmpty() && !clientWinPile.isEmpty() && !hostWinPile.isEmpty()) {
+        drawWarCards = false;
+        if ((!clientCards.isEmpty() || !clientWinPile.isEmpty()) && (!hostCards.isEmpty() || !hostWinPile.isEmpty())) {
+            if (clientCards.isEmpty()){
+                clientCards.addAll(clientWinPile);
+                clientWinPile = new ArrayList<>();
+            }
+            if (hostCards.isEmpty()){
+                hostCards.addAll(hostWinPile);
+                hostWinPile = new ArrayList<>();
+            }
             clientFlipped = clientCards.get(0).charAt(clientCards.get(0).length()-5);
             hostFlipped = hostCards.get(0).charAt(hostCards.get(0).length()-5);
             topClientCard = clientCards.get(0);
@@ -102,6 +115,7 @@ public class GameFrame extends JFrame {
             }
             while (hostRank == clientRank && !clientCards.isEmpty() && !hostCards.isEmpty() && !clientWinPile.isEmpty() && !hostWinPile.isEmpty()) { //war prob infinite
                 war = true;
+                drawWarCards = true;
                 if (clientCards.isEmpty()){
                     clientCards.addAll(clientWinPile);
                     clientWinPile = new ArrayList<>();
@@ -163,10 +177,14 @@ public class GameFrame extends JFrame {
             if(hostRank > clientRank) {
                 hostWinPile.addAll(warPile);
                 warPile = new ArrayList<String>();
+                hostWonWar = "You won the war!";
+                clientWonWar = "You lost the war!";
             }
             else if(clientRank > hostRank) {
                 clientWinPile.addAll(warPile);
                 warPile = new ArrayList<String>();
+                hostWonWar = "You lost the war!";
+                clientWonWar = "You won the war!";
             }
         }
     }
@@ -254,32 +272,35 @@ public class GameFrame extends JFrame {
                 g2d.drawString("Flip Card", x + X_PAD*3, y + Y_PAD + CARD_HEIGHT);
             }
             x += CARD_WIDTH + X_PAD*4;
-            if (hostwarPile.size() > 2) {
-                g2d.drawImage(getImage("back.png"), x, y - Y_PAD*2, this);
-                g2d.drawRect(x, y - Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
-            }
-            if (hostwarPile.size() > 1) {
-                g2d.drawImage(getImage("back.png"), x, y - Y_PAD, this);
-                g2d.drawRect(x, y - Y_PAD, CARD_WIDTH, CARD_HEIGHT);
-            }
-            if (hostwarPile.size() > 0) {
-                g2d.drawImage(getImage(hostwarPile.get(0)), x, y, this);
-                g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
-                g2d.drawString("War", x + X_PAD*3, y + Y_PAD + CARD_HEIGHT);
+            if (drawWarCards) {
+                if (hostwarPile.size() > 2) {
+                    g2d.drawImage(getImage("back.png"), x, y - Y_PAD*2, this);
+                    g2d.drawRect(x, y - Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
+                }
+                if (hostwarPile.size() > 1) {
+                    g2d.drawImage(getImage("back.png"), x, y - Y_PAD, this);
+                    g2d.drawRect(x, y - Y_PAD, CARD_WIDTH, CARD_HEIGHT);
+                }
+                if (hostwarPile.size() > 0) {
+                    g2d.drawImage(getImage(hostwarPile.get(hostwarPile.size()-1)), x, y, this);
+                    g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+                    g2d.drawString("War", x + X_PAD*3, y + Y_PAD + CARD_HEIGHT);
+                    g2d.drawString(hostWonWar, x + X_PAD*2, y + Y_PAD*2 + CARD_HEIGHT);
+                }
             }
             x += CARD_WIDTH + X_PAD*4;
-            if (hostWinPile.size() > 0) {
-                g2d.drawImage(getImage(hostWinPile.get(0)), x, y, this);
+            if (hostWinPile.size() > 2) {
+                g2d.drawImage(getImage(hostWinPile.get(hostWinPile.size()-3)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
-                g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y + Y_PAD + CARD_HEIGHT);
             }
             if (hostWinPile.size() > 1) {
-                g2d.drawImage(getImage(hostWinPile.get(1)), x + X_PAD*2, y, this);
+                g2d.drawImage(getImage(hostWinPile.get(hostWinPile.size()-2)), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
             }
-            if (hostWinPile.size() > 2) {
-                g2d.drawImage(getImage(hostWinPile.get(2)), x + X_PAD*4, y, this);
+            if (hostWinPile.size() > 0) {
+                g2d.drawImage(getImage(hostWinPile.get(hostWinPile.size()-1)), x + X_PAD*4, y, this);
                 g2d.drawRect(x + X_PAD*4, y, CARD_WIDTH, CARD_HEIGHT);
+                g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y + Y_PAD + CARD_HEIGHT);
             }
 
             // Draw Player 2 Info
@@ -307,32 +328,35 @@ public class GameFrame extends JFrame {
                 g2d.drawString("Flip Card", x + X_PAD*3, y - (int)(Y_PAD*0.5));
             }
             x += CARD_WIDTH + X_PAD*4;
-            if (clientwarPile.size() > 2) {
-                g2d.drawImage(getImage("back.png"), x, y + Y_PAD*2, this);
-                g2d.drawRect(x, y + Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
-            }
-            if (clientwarPile.size() > 1) {
-                g2d.drawImage(getImage("back.png"), x, y + Y_PAD, this);
-                g2d.drawRect(x, y + Y_PAD, CARD_WIDTH, CARD_HEIGHT);
-            }
-            if (clientwarPile.size() > 0) {
-                g2d.drawImage(getImage(clientwarPile.get(0)), x, y, this);
-                g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
-                g2d.drawString("War", x + X_PAD*3, y - (int)(Y_PAD*0.5));
+            if (drawWarCards) {
+                if (clientwarPile.size() > 2) {
+                    g2d.drawImage(getImage("back.png"), x, y + Y_PAD*2, this);
+                    g2d.drawRect(x, y + Y_PAD*2, CARD_WIDTH, CARD_HEIGHT);
+                }
+                if (clientwarPile.size() > 1) {
+                    g2d.drawImage(getImage("back.png"), x, y + Y_PAD, this);
+                    g2d.drawRect(x, y + Y_PAD, CARD_WIDTH, CARD_HEIGHT);
+                }
+                if (clientwarPile.size() > 0) {
+                    g2d.drawImage(getImage(clientwarPile.get(clientwarPile.size()-1)), x, y, this);
+                    g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
+                    g2d.drawString("War", x + X_PAD*3, y - (int)(Y_PAD*0.5));
+                    g2d.drawString(clientWonWar, x + X_PAD*2, y - Y_PAD*2);
+                }
             }
             x += CARD_WIDTH + X_PAD*4;
-            if (clientWinPile.size() > 0) {
-                g2d.drawImage(getImage(clientWinPile.get(0)), x, y, this);
+            if (clientWinPile.size() > 2) {
+                g2d.drawImage(getImage(clientWinPile.get(clientWinPile.size()-3)), x, y, this);
                 g2d.drawRect(x, y, CARD_WIDTH, CARD_HEIGHT);
-                g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y - (int)(Y_PAD*0.5));
             }
             if (clientWinPile.size() > 1) {
-                g2d.drawImage(getImage(clientWinPile.get(1)), x + X_PAD*2, y, this);
+                g2d.drawImage(getImage(clientWinPile.get(clientWinPile.size()-2)), x + X_PAD*2, y, this);
                 g2d.drawRect(x + X_PAD*2, y, CARD_WIDTH, CARD_HEIGHT);
             }
-            if (clientWinPile.size() > 2) {
-                g2d.drawImage(getImage(clientWinPile.get(2)), x + X_PAD*4, y, this);
+            if (clientWinPile.size() > 0) {
+                g2d.drawImage(getImage(clientWinPile.get(clientWinPile.size()-1)), x + X_PAD*4, y, this);
                 g2d.drawRect(x + X_PAD*4, y, CARD_WIDTH, CARD_HEIGHT);
+                g2d.drawString("Win Pile", x + CARD_WIDTH - X_PAD*5, y - (int)(Y_PAD*0.5));
             }
         }
 

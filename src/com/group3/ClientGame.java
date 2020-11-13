@@ -58,7 +58,12 @@ public class ClientGame extends GameFrame {
             System.out.println("Past While Loop!");
             NetworkUtility.writeSocket("Flipped");
             System.out.println("Wrote Flipped!");
-            NetworkUtility.readSocket();
+            if (NetworkUtility.readSocket() == null)
+            {
+                dispose();
+                NetworkUtility.disconnect();
+                JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
             hostCardFlipped = true;
             flipCards();
             System.out.println("Cards Flipped!");
@@ -74,47 +79,29 @@ public class ClientGame extends GameFrame {
             System.out.println("Graphics repainted!");
             next.setEnabled(true);
         }
+        next.setEnabled(false);
 
         if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
             System.out.println("Host won");
-            //NetworkUtility.writeSocket("Host won");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Sorry, better luck next time!", "You Lose!", JOptionPane.PLAIN_MESSAGE);
         }
         else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
             System.out.println("Client won");
-            //NetworkUtility.writeSocket("Client won");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Congratulations, you won!", "You Win!", JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            System.out.println("Error: Game quit but nobody won!");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Oopsie Oopsie :(", "Uh Oh!", JOptionPane.WARNING_MESSAGE);
         }
 
-        /*while (!brk) {
-            String message = NetworkUtility.readSocket();
-            if (message.startsWith("WAR:")) {//WAR
-                war = true;
-            } else if (message.equals("Client won") || message.equals("Host won")) {
-                brk = true;
-            }
-            else if (message.equals("Flipped")) {
-
-            }
-            else if (message.startsWith("topHostCard")){
-                topHostCard = message;
-            }
-            else if (message.startsWith("topClientCard")){
-                topClientCard = message;
-            }
-            graphicsPanel.repaint();
-            next.setEnabled(true);
-        }*/
     }
 
-
-
-    /*public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==next) {
-            System.out.println("Client clicked next");
-            next.setEnabled(false);
-            NetworkUtility.writeSocket("Flipped");
-            clientCardFlipped = true;
-        }
-    }*/
 
     public class playGame implements Runnable {
 

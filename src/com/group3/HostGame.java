@@ -1,9 +1,7 @@
 package com.group3;
 
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JButton;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -82,7 +80,12 @@ public class HostGame extends GameFrame {
             System.out.println("Past While Loop!");
             NetworkUtility.writeSocket("Flipped");
             System.out.println("Wrote Flipped!");
-            NetworkUtility.readSocket();
+            if (NetworkUtility.readSocket() == null)
+            {
+                dispose();
+                NetworkUtility.disconnect();
+                JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
             clientCardFlipped = true;
             flipCards();
             System.out.println("Cards Flipped!");
@@ -99,14 +102,25 @@ public class HostGame extends GameFrame {
             next.setEnabled(true);
             //NetworkUtility.writeSocket("NextState");
         }
+        next.setEnabled(false);
 
         if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
             System.out.println("Host won");
-            //NetworkUtility.writeSocket("Host won");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Congratulations, you won!", "You Win!", JOptionPane.PLAIN_MESSAGE);
         }
         else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
             System.out.println("Client won");
-            //NetworkUtility.writeSocket("Client won");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Sorry, better luck next time!", "You Lose!", JOptionPane.PLAIN_MESSAGE);
+        }
+        else {
+            System.out.println("Error: Game quit but nobody won!");
+            dispose();
+            NetworkUtility.disconnect();
+            JOptionPane.showMessageDialog(new MainMenu(), "Oopsie Oopsie :(", "Uh Oh!", JOptionPane.WARNING_MESSAGE);
         }
     }
 
