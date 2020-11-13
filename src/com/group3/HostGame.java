@@ -14,41 +14,27 @@ import java.util.prefs.BackingStoreException;
 import java.net.*;
 import java.io.*;
 
-public class HostGame extends GameFrame implements ActionListener{
-
-
-   /* private Socket          socket   = null;
-    private ServerSocket    server   = null;
-    private DataInputStream in       = null;
-*/
-
+public class HostGame extends GameFrame {
 
     public HostGame(String player1Name, String player2Name) {
         super(player1Name, player2Name);
         initializeGUI();
     }
 
-//    @Override
+    @Override
     protected void initializeGUI() {
         super.initializeGUI();
         setTitle("Host Game");
         next.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                    System.out.println("Host clicked next");
-                    next.setEnabled(false);
-                    hostCardFlipped = true;
-                    NetworkUtility.writeSocket("Flipped");
+                System.out.println("Host clicked next");
+                hostCardFlipped = true;
+                next.setEnabled(false);
             }
         });
         Thread game = new Thread(new playGame());
-        game.start();/*
-        try {
-            game.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        game.start();
     }
     
     public void playGame() {
@@ -82,20 +68,24 @@ public class HostGame extends GameFrame implements ActionListener{
         for (int i = 0; i < 26; i++) {
             clientCards.add(cards.get(i));
             hostCards.add(cards.get(i+26));
-//            NetworkUtility.writeSocket("clientCards[i]" + clientCards.add(cards.get(i)));
-//            NetworkUtility.writeSocket("hostCards[i]" + hostCards.add(cards.get(i)));
         }
         NetworkUtility.writeSocket(clientCards.toString());
         NetworkUtility.writeSocket(hostCards.toString());
+
         System.out.println(clientCards);
         System.out.println(hostCards);
-        while(true) {
-            if(NetworkUtility.readSocket()!=null) {
 
+        while(true) {
+            while(hostCardFlipped == false) {
+                System.out.print("");
             }
+            System.out.println("Past While Loop!");
+            NetworkUtility.writeSocket("Flipped");
+            System.out.println("Wrote Flipped!");
+            NetworkUtility.readSocket();
             clientCardFlipped = true;
-            while(!hostCardFlipped);
             flipCards();
+            System.out.println("Cards Flipped!");
             clientCardFlipped = false;
             hostCardFlipped = false;
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
@@ -105,20 +95,20 @@ public class HostGame extends GameFrame implements ActionListener{
                 break;
             }
             graphicsPanel.repaint();
-//            next.setEnabled(true);
-            NetworkUtility.writeSocket("NextState");
+            System.out.println("Graphics repainted!");
+            next.setEnabled(true);
+            //NetworkUtility.writeSocket("NextState");
+        }
+
+        if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
+            System.out.println("Host won");
+            //NetworkUtility.writeSocket("Host won");
+        }
+        else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
+            System.out.println("Client won");
+            //NetworkUtility.writeSocket("Client won");
         }
     }
-
-
-    /*public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==next) {
-            System.out.println("Host clicked next");
-            next.setEnabled(false);
-            hostCardFlipped = true;
-            NetworkUtility.writeSocket("Flipped");
-        }
-    }*/
 
     public class playGame implements Runnable {
 
@@ -126,14 +116,6 @@ public class HostGame extends GameFrame implements ActionListener{
 
         public void run() {
             playGame();
-            if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
-                System.out.println("Host won");
-                NetworkUtility.writeSocket("Host won");
-            }
-            else if (hostCards.isEmpty() && hostWinPile.isEmpty()) {
-                System.out.println("Client won");
-                NetworkUtility.writeSocket("Client won");
-            }
         }
     }
 

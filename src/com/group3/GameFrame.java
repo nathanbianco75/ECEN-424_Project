@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class GameFrame extends JFrame implements ActionListener{
+public class GameFrame extends JFrame {
 
     protected GraphicsPanel graphicsPanel;
     protected String player1Name;
@@ -40,7 +40,7 @@ public class GameFrame extends JFrame implements ActionListener{
         super();
         this.player1Name = player1Name;
         this.player2Name = player2Name;
-        initializeGUI();
+        //initializeGUI();
     }
 
     protected void initializeGUI() {
@@ -84,9 +84,9 @@ public class GameFrame extends JFrame implements ActionListener{
             clientFlipped = clientCards.get(0).charAt(clientCards.get(0).length()-5);
             hostFlipped = hostCards.get(0).charAt(hostCards.get(0).length()-5);
             topClientCard = clientCards.get(0);
-            NetworkUtility.writeSocket("topClientCard: " + topClientCard);
+            //NetworkUtility.writeSocket("topClientCard: " + topClientCard);
             topHostCard = hostCards.get(0);
-            NetworkUtility.writeSocket("topHostCard" + topHostCard);
+            //NetworkUtility.writeSocket("topHostCard" + topHostCard);
             getRanks();
             if(clientRank > hostRank) {
                 clientWinPile.add(clientCards.get(0));
@@ -154,9 +154,9 @@ public class GameFrame extends JFrame implements ActionListener{
                 clientwarPile.add(clientCards.get(0));
                 hostwarPile.add(hostCards.get(0));
                 topClientCard = clientCards.get(0);
-                NetworkUtility.writeSocket("WAR: " + topClientCard);
+                //NetworkUtility.writeSocket("WAR: " + topClientCard);
                 topHostCard = hostCards.get(0);
-                NetworkUtility.writeSocket("WAR: " + topHostCard);
+                //NetworkUtility.writeSocket("WAR: " + topHostCard);
                 clientCards.remove(0);
                 hostCards.remove(0);
             }
@@ -196,12 +196,6 @@ public class GameFrame extends JFrame implements ActionListener{
                 case 'K' -> hostRank = 13;
             }
         }
-    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
     }
 
     protected class GraphicsPanel extends JPanel {

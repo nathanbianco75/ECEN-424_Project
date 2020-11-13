@@ -165,7 +165,7 @@ public class PreGameLobby extends JFrame {
             else {
                 if (NetworkUtility.readSocket() != null) {
                     dispose();
-                    new ClientGame(name, opponent_name.getText());
+                    new ClientGame(opponent_name.getText(), name);
                 }
                 else if (!forceClose) {
                     dispose();
