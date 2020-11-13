@@ -94,6 +94,7 @@ public class HostGame extends GameFrame {
                 break;
             }
             graphicsPanel.repaint();
+            next.setEnabled(true);
             NetworkUtility.writeSocket("NextState");
         }
     }
@@ -219,6 +220,8 @@ public class HostGame extends GameFrame {
 
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==next) {
+            System.out.println("Host clicked next");
+            next.setEnabled(false);
             hostCardFlipped = true;
             NetworkUtility.writeSocket("Flipped");
         }

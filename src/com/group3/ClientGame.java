@@ -31,18 +31,21 @@ public class ClientGame extends GameFrame {
         next.addActionListener(this);
         setTitle("Client Game");
         while (!brk) {
-            if (NetworkUtility.readSocket().startsWith("WAR:")) {//WAR
+            String message = NetworkUtility.readSocket();
+            if (message.startsWith("WAR:")) {//WAR
                 war = true;
-            } else if (NetworkUtility.readSocket().equals("Client won") || NetworkUtility.readSocket().equals("Host won")) {
+            } else if (message.equals("Client won") || message.equals("Host won")) {
                 brk = true;
             }
-            else if (NetworkUtility.readSocket().equals("Flipped")) {
+            else if (message.equals("Flipped")) {
 
             }
             else {
                 this.topClientCard = NetworkUtility.readSocket();
                 this.topHostCard = NetworkUtility.readSocket();
             }
+            graphicsPanel.repaint();
+            next.setEnabled(true);
         }
 
         if (clientCards.isEmpty() && clientWinPile.isEmpty()) {
@@ -55,8 +58,11 @@ public class ClientGame extends GameFrame {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource()==next)
+        if(e.getSource()==next) {
+            System.out.println("Client clicked next");
+            next.setEnabled(false);
             NetworkUtility.writeSocket("Flipped");
+        }
     }
 
 

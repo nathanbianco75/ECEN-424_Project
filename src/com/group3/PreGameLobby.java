@@ -163,11 +163,14 @@ public class PreGameLobby extends JFrame {
 
             // else the client, wait to receive the server's start message
             else {
-                if (NetworkUtility.readSocket() != null)
+                if (NetworkUtility.readSocket() != null) {
+                    dispose();
                     new ClientGame(name, opponent_name.getText());
-                else if (!forceClose)
+                }
+                else if (!forceClose) {
+                    dispose();
                     JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
-                dispose();
+                }
             }
         }
     }
