@@ -17,8 +17,8 @@ public class GameFrame extends JFrame {
     protected GraphicsPanel graphicsPanel;
     protected String player1Name;
     protected String player2Name;
-    protected final int FRAME_WIDTH = 1750;
-    protected final int FRAME_HEIGHT = 900;
+    protected final int FRAME_WIDTH = 1850;
+    protected final int FRAME_HEIGHT = 1000;
     protected JButton next;
     public ArrayList<String> cards = new ArrayList<String>();
     public ArrayList<String> clientCards = new ArrayList<String>();

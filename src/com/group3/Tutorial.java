@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Tutorial extends JFrame {
 
@@ -20,7 +22,15 @@ public class Tutorial extends JFrame {
         JLabel text = new JLabel(
         "<html><body>" +
                 "Welcome to our game!" + "<br><br>" +
-                "TODO" +
+                "<ul>" +
+                "<li>Each player is dealt half the deck<br></li>" +
+                "<li>Each round both players flip top card by clicking Flip button on the bottom<br></li>" +
+                "<li>Both players flipping the same card results in a war<br></li>" +
+                "<li>War means both players place 4 cards and whoever has the highest card on top gets all cards<br></li>" +
+                "<li>Player with higher card wins<br></li>" +
+                "<li>Cards placed in winner’s win pile<br></li>" +
+                "<li>Players shuffle their win pile into their hand when out of cards<br></li>" +
+                "<li>A player wins when they have all 52 cards<br></li>" +
             "</body></html>"
         );
 
@@ -34,7 +44,7 @@ public class Tutorial extends JFrame {
         });
 
         JPanel content = new JPanel();
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setBorder(new EmptyBorder(5, 5, 5, 5));
         content.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -49,11 +59,18 @@ public class Tutorial extends JFrame {
         content.add(buttons, gbc);
 
         add(content);
-        setSize(500, 600);
+        setSize(800, 600);
         setResizable(false);
         setLocationRelativeTo(null);
         setTitle("Tutorial");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                tutorial.setEnabled(true);
+            }
+        });
         setVisible(true);
     }
 }
