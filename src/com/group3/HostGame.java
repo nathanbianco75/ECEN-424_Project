@@ -44,6 +44,7 @@ public class HostGame extends GameFrame {
     @Override
     protected void initializeGUI() {
         super.initializeGUI();
+        setTitle("Host Game");
         this.next.addActionListener(this);
         this.playGame();
 
@@ -55,7 +56,6 @@ public class HostGame extends GameFrame {
             System.out.println("Client won");
             NetworkUtility.writeSocket("Client won");
         }
-        setTitle("Host Game");
     }
     
     public void playGame() {
