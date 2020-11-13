@@ -77,7 +77,13 @@ public class HostGame extends GameFrame {
         for (int i = 0; i < 26; i++) {
             clientCards.add(cards.get(i));
             hostCards.add(cards.get(i+26));
+//            NetworkUtility.writeSocket("clientCards[i]" + clientCards.add(cards.get(i)));
+//            NetworkUtility.writeSocket("hostCards[i]" + hostCards.add(cards.get(i)));
         }
+        NetworkUtility.writeSocket(clientCards.toString());
+        NetworkUtility.writeSocket(hostCards.toString());
+        System.out.println(clientCards);
+        System.out.println(hostCards);
         while(true) {
             if(NetworkUtility.readSocket()!=null) {
 
@@ -104,9 +110,9 @@ public class HostGame extends GameFrame {
             clientFlipped = clientCards.get(0).charAt(clientCards.get(0).length()-5);
             hostFlipped = hostCards.get(0).charAt(hostCards.get(0).length()-5);
             topClientCard = clientCards.get(0);
-            NetworkUtility.writeSocket(topClientCard);
+            NetworkUtility.writeSocket("topClientCard: " + topClientCard);
             topHostCard = hostCards.get(0);
-            NetworkUtility.writeSocket(topHostCard);
+            NetworkUtility.writeSocket("topHostCard" + topHostCard);
             getRanks();
             if(clientRank > hostRank) {
                 clientWinPile.add(clientCards.get(0));
