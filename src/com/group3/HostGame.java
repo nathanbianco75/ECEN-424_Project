@@ -73,7 +73,7 @@ public class HostGame extends GameFrame {
         System.out.println(clientCards);
         System.out.println(hostCards);
 
-        while(true) {
+        while(playGame) {
             while(hostCardFlipped == false) {
                 System.out.print("");
             }
@@ -86,18 +86,29 @@ public class HostGame extends GameFrame {
                 NetworkUtility.disconnect();
                 JOptionPane.showMessageDialog(new MainMenu(), "Lost connection to opponent.", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            System.out.println("Read Socket!");
             clientCardFlipped = true;
             flipCards();
             System.out.println("Cards Flipped!");
             clientCardFlipped = false;
             hostCardFlipped = false;
             if (clientCards.isEmpty() && clientWinPile.isEmpty()) { //Host won
+                playGame = false;
                 break;
             }
             if (hostCards.isEmpty() && hostWinPile.isEmpty()) { //Client won
+                playGame = false;
                 break;
             }
             graphicsPanel.repaint();
+            try
+            {
+                Thread.sleep(2000);
+            }
+            catch(InterruptedException ex)
+            {
+                Thread.currentThread().interrupt();
+            }
             System.out.println("Graphics repainted!");
             next.setEnabled(true);
             //NetworkUtility.writeSocket("NextState");
